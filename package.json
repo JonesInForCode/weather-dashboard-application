@@ -1,0 +1,12 @@
+{
+  "name": "weather-dashboard-application",
+  "version": "1.0.0",
+  "description": "Weather dashboard the fetches data from a weather API, displays current conditions and forecasts, allows users to save favorite locations.",
+  "license": "MIT",
+  "author": "JonesInForCode",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
