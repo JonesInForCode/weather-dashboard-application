@@ -66,6 +66,60 @@ function processForecastData(forecastData) {
         // Get the date (without time)
         const date = item.dt_txt.split(' ')[0];
 
+        // If the date is not already in the dailyData object, create an entry
+        if (!dailyData[date]) {
+            dailyData[date]= {
+                temps: [],
+                humidity: [],
+                weather: [],
+                icon: null,
+                date
+            };
+        }
 
-    })
-};
+        // Push the temperature, humidity, and weather data into the respective arrays
+        dailyData[date].temps.push(item.main.temp);
+        dailyData[date].humidity.push(item.main.humidity);
+        dailyData[date].weather.push(item.weather[0].main);
+
+        if (item.dt_txt.includes('12:00')) {
+            // Store the icon for the day (12:00 is usually the most representative)
+            dailyData[date].icon = item.weather[0].icon;
+        }
+    });
+
+    // Calculate average and prepare final data
+    return Object.values(dailyData).map(day => {
+        // Calculate average temperature
+        const avgTemp = day.temps.reduce((sum, temp) => sum + temp, 0) / day.temps.length;
+
+        // Calculate average humidity
+        const avgHumidity = day.humidity.reduce((sum, humidity) => sum + humidity, 0 )/ day.humidity.length;
+
+        // Get the most common weather condition
+        const weatherCounts = {};
+        day.weather.forEach(weather => {
+            weatherCounts[weather] = (weatherCounts[weather] || 0) + 1;
+        });
+
+        let mostCommonWeather = '';
+        let maxCount = 0;
+
+        Object.entries(weatherCounts).forEach(([weather, count]) => {
+            if (count > maxCount) {
+                mostCommonWeather = weather;
+                maxCount = count;
+            }
+        });
+
+        const icon = day.icon || day.weather[0].icon;
+
+        return {
+            date: day.date,
+            temp: avgTemp.toFixed(1),
+            humidity: avgHumidity.toFixed(1),
+            weather: mostCommonWeather,
+            icon
+        };
+    }).slice(0, 5); // Limit to 5 days
+}
